@@ -40,7 +40,7 @@ function main() {
 	
 	
 	/*Get The Location Of The Shaders Properties And Store Them In An Object
-	========================================================================*/
+	=====================================================================*/
 	
 	const programLocations = {
 		program: shaderProgram,
@@ -54,6 +54,22 @@ function main() {
 	};
 	
 	const buffers = initBuffers(gl); // Create the buffers that define the shapes
+	
+	
+	/*Finaly Actualy Render The Scene
+	=================================*/
+	
+	var then = 0; // Make a variable to store the last time
+	
+	function render(now) {
+		now *= 0.001; // Aparently convert to seconds, but idk
+		const deltaTime = now - then; // See how much time has passed since the last frame
+		then = now; // Update the time of the last frame
+		
+		drawScene(gl, programInfo, buffers, deltaTime); // Call the function that draws the scene
+		requestAnimationFrame(render); // Request the drawing of the next frame
+	}
+	requestAnimationFrame(render); // Start the animation
 }
 
 
