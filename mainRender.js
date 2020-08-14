@@ -198,4 +198,39 @@ function initBuffers(gl) {
 }
 
 
+/*Finaly Actualy Draw The Scene
+===============================*/
+
+function drawScene(gl, programInfo, buffers, deltaTime) {
+	
+	// Set gl values and specify features
+	gl.clearColor(0.0, 0.0, 0.0, 1.0); // Set the color used to clear the buffer to black
+	gl.clearDepth(1.0); // Set the depth used to clear the depth buffer to 1.0
+	gl.enable(gl.DEPTH_TEST); // Make webgl update the depth buffer
+	gl.depthFunc(gl.LEQUAL); // Only draw a fragment if it is not obscured by a closer object
+	
+	gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT); // Clear everything to start fresh
+	
+	/* Remember: model cordinates  * model matrix      = world cordinates
+	             world cordinates  * veiw matrix       = camera cordinates
+	             camera cordinates * projection matrix = homogeneous cordinates(that are deformed to look like they are from the perspective of the camera)*/
+	
+	// Set info requiered for the projection martix
+	const feildOfVeiw = 70; // Set feild of veiw in degrees
+	const radFeildOfVeiw = feildOfVeiw * Math.PI / 180; // Convert to radiens
+	const aspectRatio = gl.canvas.clientWidth / gl.canvas.clientHeight; // Get the aspect ratio
+	const zNear = 0.1; // Don't show objects if closer than this distance
+	const zFar = 100.0; // Don't show objects if farther than this distance
+	
+	// Create the projection matrix
+	const projectionMatrix = mat4.create(); // Create a matrix
+	mat4.perspective(projectionMatrix, radFeildOfVeiw, aspectRatio, zNear, zFar); // Populate the projection matrix to match the set peramaters
+	
+	// Create a combined veiw and model matrix
+	const modelViewMatrix = mat4.create(); // Create a matrix
+	mat4.translate(modelViewMatrix, modelViewMatrix, [-0.0, 0.0, -6.0]); // Translate the camera back 6 units
+	mat4.rotate(modelViewMatrix, modelViewMatrix, cubeRotation, [0, 0, 1]); // Rotate the cube around the z axis
+	mat4.rotate(modelViewMatrix, modelViewMatrix, cubeRotation * 0.7, [0, 1, 0]); // Rotate the cube around the y axis
+}
+
 window.onload = main;
