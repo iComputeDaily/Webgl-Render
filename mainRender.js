@@ -1,3 +1,7 @@
+import {mat4} from './glmatrix/index.js'; // Import a library for dealing with matricies
+
+var cubeRotation = 0.0; // Set how much the cube should rotate
+
 function main() {
 	
 	
@@ -42,7 +46,7 @@ function main() {
 	/*Get The Location Of The Shaders Properties And Store Them In An Object
 	=====================================================================*/
 	
-	const programLocations = {
+	const programInfo = {
 		program: shaderProgram,
 		attribLocations: {
 			vertexPosition: gl.getAttribLocation(shaderProgram, 'aVertexPosition'),
