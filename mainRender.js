@@ -2,6 +2,8 @@ import {mat4} from './glmatrix/index.js'; // Import a library for dealing with m
 
 var cubeRotation = 0.0; // Set how much the cube should rotate
 
+main();
+
 function main() {
 	
 	
@@ -9,7 +11,12 @@ function main() {
 	===============================*/
 	
 	const canvas = document.querySelector("#glCanvas"); // Find the element we want to draw to
-	const gl = canvas.getContext("experimental-webgl"); // Get the context
+	
+	canvas.width = canvas.clientWidth; // Make shure the browser and webgl agree on the width
+	canvas.height = canvas.clientHeight; // Make shure the browser and webgl agree on the height
+	
+	const gl = canvas.getContext('experimental-webgl');
+ // Get the context
 	
 	// Exit if something went worng
 	if (gl === null) {
@@ -260,7 +267,7 @@ function drawScene(gl, programInfo, buffers, deltaTime) {
 	
 	gl.uniformMatrix4fv(programInfo.uniformLocations.modelViewMatrix, // Set the veiw matrix to use
 		false, // Don't transpose the matrix
-		projectionMatrix); // Set it to modelViewMatrix
+		modelViewMatrix); // Set it to modelViewMatrix
 	
 	{ // Draw the scene (no for real this time)
 	const vertexCount = 36; // How many vertecies to render
