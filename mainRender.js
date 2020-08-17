@@ -235,6 +235,41 @@ function drawScene(gl, programInfo, buffers, deltaTime) {
 	mat4.translate(modelViewMatrix, modelViewMatrix, [-0.0, 0.0, -6.0]); // Translate the camera back 6 units
 	mat4.rotate(modelViewMatrix, modelViewMatrix, cubeRotation, [0, 0, 1]); // Rotate the cube around the z axis
 	mat4.rotate(modelViewMatrix, modelViewMatrix, cubeRotation * 0.7, [0, 1, 0]); // Rotate the cube around the y axis
+	
+	// Tell opengl to use the vertex positions in the vertex shader.
+	gl.bindBuffer(gl.ARRAY_BUFFER, buffers.position); // Get the position buffer ready to be writen to
+	
+	{ // Tell opengl where the vertecies are
+	const numComponents = 3; // The number of items that specify one vertex
+	const type = gl.FLOAT; // The type that we use to store the vertecies
+	const normalize = false; // Weather the numbers should be converted to vales between -1 and 1
+	const stride = 0; // How many bytes between the vertecies in the array
+	const offset = 0; // How many from the begining of the array before the vertecies
+	gl.vertexAttribPointer(programInfo.attribLocations.vertexPosition, numComponents, type, normalize, stride, offset); // Give all the data to opengl (The first paramater is the index)
+	}
+	gl.enableVertexAttribArray(programInfo.attribLocations.vertexPosition); // Enable the atribute so that it will actualy get used
+	
+	gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, buffers.indices); // Tell opengl what buffer should be used for the index
+	
+	gl.useProgram(programInfo.program); // Tell opengl the use our shader program
+	
+	// Set what matricies to use
+	gl.uniformMatrix4fv(programInfo.uniformLocations.projectionMatrix, // Set the projection matrix to use
+		false, // Don't transpose the matrix
+		projectionMatrix); // Set it to projectionMatrix
+	
+	gl.uniformMatrix4fv(programInfo.uniformLocations.modelViewMatrix, // Set the veiw matrix to use
+		false, // Don't transpose the matrix
+		projectionMatrix); // Set it to modelViewMatrix
+	
+	{ // Draw the scene (no for real this time)
+	const vertexCount = 36; // How many vertecies to render
+	const type = gl.UNSIGNED_SHORT; // What type the numbers are
+	const offset = 0; // How far to the start of the vertecies
+	gl.drawElements(gl.TRIANGLES, vertexCount, type, offset);
+	}
+	
+	cubeRotation += deltaTime; // Update cubeRotation
 }
 
 window.onload = main;
