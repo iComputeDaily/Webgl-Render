@@ -66,12 +66,12 @@ function main() {
 	const buffers = initBuffers(gl); // Create the buffers that define the shapes
 	
 	
-	/*Initalize The Keyboard
-	========================*/
+	/*Set Up The Keyboard
+	=====================*/
 	
-	var keyStatus = initKeyObject();
-	document.addEventListener("keydown", function(){keyDownCallback(event, keyStatus)});
-	document.addEventListener("keyup", function(){keyUpCallback(event, keyStatus)});
+	var keyStatus = initKeyObject(); // Create an object to store the keyboard state
+	document.addEventListener("keydown", function(){keyDownCallback(event, keyStatus)}); // Add function to handle button presses
+	document.addEventListener("keyup", function(){keyUpCallback(event, keyStatus)}); // Add a function to handle button releases
 	
 	
 	/*Finaly Actualy Render The Scene
@@ -216,8 +216,8 @@ function initBuffers(gl) {
 }
 
 
-/*Initalize The Keyboard
-========================*/
+/*Create An Object To Store The Keyboard State
+==============================================*/
 
 function initKeyObject() {
 	var keyStatus = {
@@ -245,15 +245,23 @@ function initKeyObject() {
 	return keyStatus;
 }
 
+
+/*Function To handle Button Presses
+===================================*/
+
 function keyDownCallback(event, keyStatus) {
-	event.stopImmediatePropagation();
+	event.stopImmediatePropagation(); // Stop the event from triggering twice
+	
+	// Stop the event from trigering multiple times on held key
 	if (event.repeat == true) {
 		return;
 	}
+	
+	// Determine what key was pressed and update paramaters in the object
 	switch (event.code) {
 		case 'KeyW':
-			keyStatus.forwardKey.timeLastPressed = performance.now();
-			keyStatus.forwardKey.pressedNow = true;
+			keyStatus.forwardKey.timeLastPressed = performance.now(); // Set to current time
+			keyStatus.forwardKey.pressedNow = true; // I hope it is obvios what this dose
 			break;
 		case 'KeyA':
 			keyStatus.leftKey.timeLastPressed = performance.now();
@@ -266,21 +274,30 @@ function keyDownCallback(event, keyStatus) {
 		case 'KeyD':
 			keyStatus.rightKey.timeLastPressed = performance.now();
 			keyStatus.rightKey.pressedNow = true;
-		break;
+			break;
 	}
-	console.log(keyStatus);
+	console.log(keyStatus); // Will probobly need this for debuging later
 	return;
 }
+
+
+/*Function To Handle Button Releaces
+====================================*/
+
 function keyUpCallback(event, keyStatus) {
-	event.stopImmediatePropagation();
+	event.stopImmediatePropagation(); // Stop the event from triggering twice
+	
+	// Stop the event from trigering multiple times on held key
 	if (event.repeat == true) {
 		return;
 	}
+	
+	// Determine what key was pressed and update paramaters in the object
 	switch (event.code) {
 		case 'KeyW':
-			keyStatus.forwardKey.totalTimePressed += performance.now() - keyStatus.forwardKey.timeLastPressed;
-			keyStatus.forwardKey.timeLastPressed = 0;
-			keyStatus.forwardKey.pressedNow = false;
+			keyStatus.forwardKey.totalTimePressed += performance.now() - keyStatus.forwardKey.timeLastPressed; // The total time the button was pressed for is the current time minus the time it was last pressed, added to any previous time it was pressed for
+			keyStatus.forwardKey.timeLastPressed = 0; // To prevent any repeat events that still sometimes ocur *sigh* from adding the number twice
+			keyStatus.forwardKey.pressedNow = false;// I hope it is obvios what this dose
 			break;
 		case 'KeyA':
 			keyStatus.leftKey.totalTimePressed += performance.now() - keyStatus.leftKey.timeLastPressed;
@@ -298,7 +315,7 @@ function keyUpCallback(event, keyStatus) {
 			keyStatus.rightKey.pressedNow = false;
 			break;
 	}
-	console.log(keyStatus);
+	console.log(keyStatus); // Will probobly need this for debuging later
 	return
 }
 
