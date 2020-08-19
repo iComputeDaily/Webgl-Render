@@ -15,8 +15,7 @@ function main() {
 	canvas.width = canvas.clientWidth; // Make shure the browser and webgl agree on the width
 	canvas.height = canvas.clientHeight; // Make shure the browser and webgl agree on the height
 	
-	const gl = canvas.getContext('experimental-webgl');
- // Get the context
+	const gl = canvas.getContext('experimental-webgl'); // Get the context
 	
 	// Exit if something went worng
 	if (gl === null) {
@@ -67,6 +66,14 @@ function main() {
 	const buffers = initBuffers(gl); // Create the buffers that define the shapes
 	
 	
+	/*Initalize The Keyboard
+	========================*/
+	
+	var keyStatus = initKeyObject();
+	document.addEventListener("keydown", function(){keyDownCallback(event, keyStatus)});
+	document.addEventListener("keyup", function(){keyUpCallback(event, keyStatus)});
+	
+	
 	/*Finaly Actualy Render The Scene
 	=================================*/
 	
@@ -77,7 +84,7 @@ function main() {
 		const deltaTime = now - then; // See how much time has passed since the last frame
 		then = now; // Update the time of the last frame
 		
-		drawScene(gl, programInfo, buffers, deltaTime); // Call the function that draws the scene
+		drawScene(gl, programInfo, buffers, deltaTime, keyStatus); // Call the function that draws the scene
 		requestAnimationFrame(render); // Request the drawing of the next frame
 	}
 	requestAnimationFrame(render); // Start the animation
@@ -143,37 +150,37 @@ function initBuffers(gl) {
 	
 	// Define the position of the vertecies
 	const positions = [
-		// Front face
+		// cube Front face
 		-1.0, -1.0,  1.0,
 		 1.0, -1.0,  1.0,
 		 1.0,  1.0,  1.0,
 		-1.0,  1.0,  1.0,
 		
-		// Back face
+		// cube Back face
 		-1.0, -1.0, -1.0,
 		-1.0,  1.0, -1.0,
 		 1.0,  1.0, -1.0,
 		 1.0, -1.0, -1.0,
 		
-		// Top face
+		// cube Top face
 		-1.0,  1.0, -1.0,
 		-1.0,  1.0,  1.0,
 		 1.0,  1.0,  1.0,
 		 1.0,  1.0, -1.0,
 		
-		// Bottom face
+		// cube Bottom face
 		-1.0, -1.0, -1.0,
 		 1.0, -1.0, -1.0,
 		 1.0, -1.0,  1.0,
 		-1.0, -1.0,  1.0,
 		
-		// Right face
+		// cube Right face
 		 1.0, -1.0, -1.0,
 		 1.0,  1.0, -1.0,
 		 1.0,  1.0,  1.0,
 		 1.0, -1.0,  1.0,
 		
-		// Left face
+		// cube Left face
 		-1.0, -1.0, -1.0,
 		-1.0, -1.0,  1.0,
 		-1.0,  1.0,  1.0,
@@ -192,12 +199,12 @@ function initBuffers(gl) {
 	
 	// Define the index numbers
 	const indices = [
-		0,  1,  2,      0,  2,  3,    // front
-		4,  5,  6,      4,  6,  7,    // back
-		8,  9,  10,     8,  10, 11,   // top
-		12, 13, 14,     12, 14, 15,   // bottom
-		16, 17, 18,     16, 18, 19,   // right
-		20, 21, 22,     20, 22, 23,   // left
+		0,  1,  2,      0,  2,  3,    // cube front
+		4,  5,  6,      4,  6,  7,    // cube back
+		8,  9,  10,     8,  10, 11,   // cube top
+		12, 13, 14,     12, 14, 15,   // cube bottom
+		16, 17, 18,     16, 18, 19,   // cube right
+		20, 21, 22,     20, 22, 23,   // cube left
 	];
 	gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(indices), gl.STATIC_DRAW); // Give opengl the index
 	
@@ -206,6 +213,93 @@ function initBuffers(gl) {
 		position: positionBuffer,
 		indices: indexBuffer
 	};
+}
+
+
+/*Initalize The Keyboard
+========================*/
+
+function initKeyObject() {
+	var keyStatus = {
+		forwardKey: {
+			totalTimePressed: 0,
+			timeLastPressed: 0,
+			pressedNow: false
+		},
+		leftKey: {
+			totalTimePressed: 0,
+			timeLastPressed: 0,
+			pressedNow: false
+		},
+		backwardKey: {
+			totalTimePressed: 0,
+			timeLastPressed: 0,
+			pressedNow: false
+		},
+		rightKey: {
+			totalTimePressed: 0,
+			timeLastPressed: 0,
+			pressedNow: false
+		}
+	};
+	return keyStatus;
+}
+
+function keyDownCallback(event, keyStatus) {
+	event.stopImmediatePropagation();
+	if (event.repeat == true) {
+		return;
+	}
+	switch (event.code) {
+		case 'KeyW':
+			keyStatus.forwardKey.timeLastPressed = performance.now();
+			keyStatus.forwardKey.pressedNow = true;
+			break;
+		case 'KeyA':
+			keyStatus.leftKey.timeLastPressed = performance.now();
+			keyStatus.leftKey.pressedNow = true;
+			break;
+		case 'KeyS':
+			keyStatus.backwardKey.timeLastPressed = performance.now();
+			keyStatus.backwardKey.pressedNow = true;
+			break;
+		case 'KeyD':
+			keyStatus.rightKey.timeLastPressed = performance.now();
+			keyStatus.rightKey.pressedNow = true;
+		break;
+	}
+	console.log(keyStatus);
+	return;
+}
+function keyUpCallback(event, keyStatus) {
+	event.stopImmediatePropagation();
+	if (event.repeat == true) {
+		return;
+	}
+	switch (event.code) {
+		case 'KeyW':
+			keyStatus.forwardKey.totalTimePressed += performance.now() - keyStatus.forwardKey.timeLastPressed;
+			keyStatus.forwardKey.timeLastPressed = 0;
+			keyStatus.forwardKey.pressedNow = false;
+			break;
+		case 'KeyA':
+			keyStatus.leftKey.totalTimePressed += performance.now() - keyStatus.leftKey.timeLastPressed;
+			keyStatus.leftKey.timeLastPressed = 0;
+			keyStatus.leftKey.pressedNow = false;
+			break;
+		case 'KeyS':
+			keyStatus.backwardKey.totalTimePressed += performance.now() - keyStatus.backwardKey.timeLastPressed;
+			keyStatus.backwardKey.timeLastPressed = 0;
+			keyStatus.backwardKey.pressedNow = false;
+			break;
+		case 'KeyD':
+			keyStatus.rightKey.totalTimePressed += performance.now() - keyStatus.rightKey.timeLastPressed;
+			keyStatus.rightKey.timeLastPressed = 0;
+			keyStatus.rightKey.pressedNow = false;
+			break;
+	}
+	console.log(keyStatus);
+	return
 }
 
 
