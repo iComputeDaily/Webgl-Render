@@ -323,7 +323,7 @@ function keyUpCallback(event, keyStatus) {
 /*Finaly Actualy Draw The Scene
 ===============================*/
 
-function drawScene(gl, programInfo, buffers, deltaTime) {
+function drawScene(gl, programInfo, buffers, deltaTime, keyStatus) {
 	
 	// Set gl values and specify features
 	gl.clearColor(0.0, 0.0, 0.0, 1.0); // Set the color used to clear the buffer to black
@@ -347,6 +347,9 @@ function drawScene(gl, programInfo, buffers, deltaTime) {
 	// Create the projection matrix
 	const projectionMatrix = mat4.create(); // Create a matrix
 	mat4.perspective(projectionMatrix, radFeildOfVeiw, aspectRatio, zNear, zFar); // Populate the projection matrix to match the set peramaters
+	
+	const cords = getCords(keyStatus); // Turn key presses into cordinates
+	console.log(cords); // Will probobly need this for debugging
 	
 	// Create a combined veiw and model matrix
 	const modelViewMatrix = mat4.create(); // Create a matrix
@@ -389,5 +392,58 @@ function drawScene(gl, programInfo, buffers, deltaTime) {
 	
 	cubeRotation += deltaTime; // Update cubeRotation
 }
+
+
+/*Turn Key Presses Into Cordinates
+==================================*/
+
+function getCords(keyStatus) {
+	var cords = {x: 0, y: 0, z: 0};
+	
+	var plusX = 0;
+	var minusX = 0;
+	var plusY = 0;
+	var minusY = 0;
+	var plusZ = 0;
+	var minusZ = 0;
+	
+	// West
+	minusX -= keyStatus.leftKey.totalTimePressed; // Set the variable to the total time pressed(minus currently pressed time)
+	if (keyStatus.leftKey.pressedNow == true) {minusX -= (performance.now() - keyStatus.leftKey.timeLastPressed);} // If the key is currently pressed add the missing time, as the totalTimePressed variable has not been updated
+	minusX *= 0.001; // Scale the result down to a reasonalbe number
+	
+	// East
+	plusX = keyStatus.rightKey.totalTimePressed;
+	if (keyStatus.rightKey.pressedNow == true) {plusX += (performance.now() - keyStatus.rightKey.timeLastPressed);}
+	plusX *= 0.001;
+	
+	// Down
+	// minusX -= keyStatus.leftKey.totalTimePressed;
+	// if (keyStatus.leftKey.pressedNow == true) {minusX -= (performance.now() - keyStatus.leftKey.timeLastPressed);}
+	// minusX *= 0.001;
+	
+	// Up
+	// plusX = keyStatus.rightKey.totalTimePressed;
+	// if (keyStatus.rightKey.pressedNow == true) {plusX += (performance.now() - keyStatus.rightKey.timeLastPressed);}
+	// plusX *= 0.001;
+	
+	// North
+	minusZ -= keyStatus.forwardKey.totalTimePressed;
+	if (keyStatus.forwardKey.pressedNow == true) {minusZ -= (performance.now() - keyStatus.forwardKey.timeLastPressed);}
+	minusZ *= 0.001;
+	
+	// South
+	plusZ += keyStatus.backwardKey.totalTimePressed;
+	if (keyStatus.backwardKey.pressedNow == true) {plusZ += (performance.now() - keyStatus.backwardKey.timeLastPressed);}
+	plusZ *= 0.001;
+	
+	// Add the values together and put them in their final place
+	cords.x = plusX + minusX;
+	cords.y = plusY + minusY;
+	cords.z = plusZ + minusZ;
+	
+	return cords;
+}
+
 
 window.onload = main;
