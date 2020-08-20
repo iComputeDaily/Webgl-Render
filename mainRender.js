@@ -240,6 +240,16 @@ function initKeyObject() {
 			totalTimePressed: 0,
 			timeLastPressed: 0,
 			pressedNow: false
+		},
+		upKey: {
+			totalTimePressed: 0,
+			timeLastPressed: 0,
+			pressedNow: false
+		},
+		downKey: {
+			totalTimePressed: 0,
+			timeLastPressed: 0,
+			pressedNow: false
 		}
 	};
 	return keyStatus;
@@ -260,23 +270,38 @@ function keyDownCallback(event, keyStatus) {
 	// Determine what key was pressed and update paramaters in the object
 	switch (event.code) {
 		case 'KeyW':
+			if (keyStatus.forwardKey.pressedNow == true) {return;} // Remove duplicate events that mess things up
 			keyStatus.forwardKey.timeLastPressed = performance.now(); // Set to current time
 			keyStatus.forwardKey.pressedNow = true; // I hope it is obvios what this dose
 			break;
 		case 'KeyA':
+			if (keyStatus.leftKey.pressedNow == true) {return;}
 			keyStatus.leftKey.timeLastPressed = performance.now();
 			keyStatus.leftKey.pressedNow = true;
 			break;
 		case 'KeyS':
+			if (keyStatus.backwardKey.pressedNow == true) {return;}
 			keyStatus.backwardKey.timeLastPressed = performance.now();
 			keyStatus.backwardKey.pressedNow = true;
 			break;
 		case 'KeyD':
+			if (keyStatus.rightKey.pressedNow == true) {return;}
 			keyStatus.rightKey.timeLastPressed = performance.now();
 			keyStatus.rightKey.pressedNow = true;
 			break;
+		case 'Space':
+			if (keyStatus.upKey.pressedNow == true) {return;}
+			keyStatus.upKey.timeLastPressed = performance.now();
+			keyStatus.upKey.pressedNow = true;
+			break;
+		case 'ShiftLeft':
+			if (keyStatus.downKey.pressedNow == true) {return;}
+			keyStatus.downKey.timeLastPressed = performance.now();
+			keyStatus.downKey.pressedNow = true;
+			break;
+		
 	}
-	console.log(keyStatus); // Will probobly need this for debuging later
+	console.log("pressed" + event.code);
 	return;
 }
 
@@ -314,9 +339,19 @@ function keyUpCallback(event, keyStatus) {
 			keyStatus.rightKey.timeLastPressed = 0;
 			keyStatus.rightKey.pressedNow = false;
 			break;
+		case 'Space':
+			keyStatus.upKey.totalTimePressed += performance.now() - keyStatus.upKey.timeLastPressed;
+			keyStatus.upKey.timeLastPressed = 0;
+			keyStatus.upKey.pressedNow = false;
+			break;
+		case 'ShiftLeft':
+			keyStatus.downKey.totalTimePressed += performance.now() - keyStatus.downKey.timeLastPressed;
+			keyStatus.downKey.timeLastPressed = 0;
+			keyStatus.downKey.pressedNow = false;
+			break;
 	}
-	console.log(keyStatus); // Will probobly need this for debuging later
-	return
+	console.log("releaced" + event.code);
+	return;
 }
 
 
@@ -418,14 +453,14 @@ function getCords(keyStatus) {
 	plusX *= 0.001;
 	
 	// Down
-	// minusX -= keyStatus.leftKey.totalTimePressed;
-	// if (keyStatus.leftKey.pressedNow == true) {minusX -= (performance.now() - keyStatus.leftKey.timeLastPressed);}
-	// minusX *= 0.001;
+	minusY -= keyStatus.downKey.totalTimePressed;
+	if (keyStatus.downKey.pressedNow == true) {minusY -= (performance.now() - keyStatus.downKey.timeLastPressed);}
+	minusY *= 0.001;
 	
 	// Up
-	// plusX = keyStatus.rightKey.totalTimePressed;
-	// if (keyStatus.rightKey.pressedNow == true) {plusX += (performance.now() - keyStatus.rightKey.timeLastPressed);}
-	// plusX *= 0.001;
+	plusY = keyStatus.upKey.totalTimePressed;
+	if (keyStatus.upKey.pressedNow == true) {plusY += (performance.now() - keyStatus.upKey.timeLastPressed);}
+	plusY *= 0.001;
 	
 	// North
 	minusZ -= keyStatus.forwardKey.totalTimePressed;
